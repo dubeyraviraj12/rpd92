@@ -1,0 +1,57 @@
+<!--
+including header content which is common for all pages
+-->
+<%- include ../layouts/header.ejs %>	
+		
+<% if (messages.error) { %>
+	<p style="color:red"><%- messages.error %></p>
+<% } %>
+
+<% if (messages.success) { %>
+	<p style="color:green"><%- messages.success %></p>
+<% } %>
+<style>
+	.bgimg-1 {
+			
+		height:100%;
+		width: 100%;
+		background-image: url('../mg22.jpg');
+		background-size: cover;
+	  }
+	  .box{
+		justify-content: center;
+		padding-left: 40%;
+		padding-top: 10%
+	  }
+	</style>
+	<div class="bgimg-1" >
+		<div class="box">
+	
+<form action="/users/edit/<%= id %>" method="post" name="form1">
+	<table width="25%" border="0">
+		<tr> 
+			<td>Name</td>
+			<td><input type="text" name="name" id="name" value="<%= name %>" /></td>
+		</tr>
+		<tr> 
+			<td>Role</td>
+			<td><input type="text" name="role" value="<%= role %>" /></td>
+		</tr>
+		<tr> 
+			<td>Email</td>
+			<td><input type="text" name="email" value="<%= email %>" /></td>
+		</tr>
+		<tr> 
+			<td></td>
+			<td><input type="submit" name="Submit" style="font-size:10pt;color:white;background-color:tomato;padding:3px;font-size: medium" value="Edit" /></td>
+		</tr>
+	</table>
+	<input type="hidden" name="_method" value="PUT" />
+</form>
+</div>
+</div>
+
+<!--
+including footer content which is common for all pages
+-->
+<%- include ../layouts/footer.ejs %>

@@ -1,0 +1,39 @@
+<!--
+including header content which is common for all pages
+-->
+	
+<style>
+.bgimg-1 {
+    
+    height: 100%;
+    width: 100%;
+    background-image: url('tcsimg.jpg');
+  }
+
+  .homedt {
+ /*margin-top: 20%;*/
+ /*margin-left: 40%;
+ margin-bottom: 50%;
+ margin-right: 20%; */
+ 
+ text-align: center;
+font-size-adjust: initial;
+font-family: Verdana, Geneva, Tahoma, sans-serif;
+margin-top: 58px;
+color:blanchedalmond;
+  }
+</style>
+<%- include layouts/header.ejs %>
+ 
+
+<div class="homedt"> 
+        <div class="bgimg-1">
+               
+<h3> Hi there ! This is Home page!!!</h3>
+<p>Use Navigator bar above for CRUD operation...</p>
+</div> 
+</div>  
+<!--
+including footer content which is common for all pages
+-->
+<%- include layouts/footer.ejs %>

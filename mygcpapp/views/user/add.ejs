@@ -1,0 +1,87 @@
+<!--
+including header content which is common for all pages
+-->
+	<%- include ../layouts/header.ejs %>
+
+	<% if (messages.error) { %>
+			        <p style="color:red"><%- messages.error %></p>
+			<% } %>
+
+	<% if (messages.success) { %>
+			        <p style="color:green"><%- messages.success %></p>
+			<% } %>
+	<style>
+	.bgimg-1 {
+
+		        height:100%;
+		        width: 100%;
+		        background-image: url('../mg22.jpg');
+		        background-size: cover;
+		  }
+  .box{
+	          justify-content: center;
+	          padding-left: 20%;
+	          padding-top: 5%
+		    }
+</style>
+	<div class="bgimg-1" >
+	        <div class="box">
+	<form action="/users/add" method="post" name="form1">
+	        <table width="80%" border="1" style="color:blue;font-size:20px ; border: groove"	>
+	                
+	                        <td>Name</td>
+	                        <td><input type="text" name="name" id="name" value="<%= name %>" placeholder="Enter your Name" style="padding-right:90pt"/></td>
+				</tr>
+		                <tr>
+	                    <td>Date of Birth</td>
+	                    <td><input type="date" name="dob" value="<%= dob %>" required style="padding-right:110pt"/></td>
+				</tr>
+				
+				<tr>
+					<td>Gender</td>
+					<td>
+					<input type="radio" name="gender" value="Male" checked> Male &nbsp;
+                    <input type="radio" name="gender" value="Female"> Female &nbsp;
+					<input type="radio" name="gender" value="Other"> Other &nbsp;
+				    </td>
+			</tr> 
+			<tr>
+					<td>Email</td>
+					<td><input type="text" name="email" value="<%= email %>" placeholder="Enter Valid email" style="padding-right:90pt"/></td>
+			</tr>
+	            <tr>
+	                    <td>Phone Number</td>
+	                    <td><input type="text" name="phone" value="<%= phone %>" placeholder="Enter 10 digits number" style="padding-right:90pt"/></td>
+	            </tr>
+	            <tr>
+	                    <td>Current Organisation</td>
+	                    <td><input type="text" name="cur_org" value="<%= cur_org %>" placeholder="Enter Organisation Name" style="padding-right:90pt"/></td>
+	            </tr>
+	            <tr>
+	                    <td>Pin Code</td>
+	                    <td><input type="text" name="zip" title="Six digit pin code" value="<%= zip%>" placeholder="6 digit pincode" style="padding-right:90pt"/></td>
+	            </tr>
+	            <tr>
+	                    <td>State</td>
+	                    <td><input type="text" name="state" value="<%= state %>" placeholder="Enter your state name" style="padding-right:90pt"/></td>
+	            </tr>
+	            <tr>
+	                    <td>City</td>
+	                    <td><input type="text" name="city" value="<%= city %>" placeholder="Enter your city name" style="padding-right:90pt"/></td>
+	            </tr>
+	            <tr>
+	                    <td>Country</td>
+	                    <td><input type="text" name="country" value="<%= country %>" placeholder="Enter Country name" style="padding-right:90pt"/></td>
+	            </tr>
+	            <tr>
+	                    <td></td>
+	                    <td><input type="submit" name="Submit" style="font-size:10pt;color:white;background-color:royalblue;font-size: medium;padding-left: 40%;padding-right: 40%" value="ADD" /></td>                </tr>
+	            </tr>
+	                </table>
+	</form>
+	</div>
+	</div>
+	<!--
+including footer content which is common for all pages
+-->
+	<%- include ../layouts/footer.ejs %>

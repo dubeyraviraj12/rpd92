@@ -1,0 +1,149 @@
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body {margin:0;}
+
+.navbar {
+  overflow: hidden;
+  background-color:teal;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  
+  
+}
+
+.logo {
+  float: right;
+  size: inherit;
+
+}
+.navbar a {
+  float: left;
+  display: block;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 14px 18px;
+  text-decoration: none;
+  font-size: 20px;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+ 
+ 
+}
+
+.navbar a:hover {
+  background:green;
+  color:yellow;
+}
+
+.main {
+  padding: 16x;
+  margin-top: 59px; 
+
+  /*height: 0px; /* Used in this example to enable scrolling */
+}
+
+
+
+</style>
+</head>
+
+<head>
+  <title><%= title %></title>
+</head>
+<body>
+
+   
+
+<div class="navbar">
+ 
+    <a href="/">Home</a>
+    <a href="/users/add">Add New User</a>
+    <a href="/users">All Users List</a>
+    
+</div>
+<div class="main"> </div>
+
+		
+<% if (messages.error) { %>
+	<p style="color:red"><%- messages.error %></p>
+<% } %>
+
+<% if (messages.success) { %>
+	<p style="color:green"><%- messages.success %></p>
+<% } %>
+<style>
+	bgimg-1 {
+			
+		height:100%;
+		width: 100%;
+		background-image: url('../img22.jpg');
+		background-size: cover;
+	  }
+	  .box{
+		justify-content: center;
+		padding-left: 40%;
+		padding-top: 10%
+	  }
+	</style>
+	<div class="bgimg-1" >
+		<div class="box">
+	
+<form action="/users/edit/<%= id %>" method="post" name="form1">
+	<table width="25%" border="0">
+		<tr> 
+			<td>Name</td>
+			<td><input type="text" name="name" id="name" value="<%= name %>" /></td>
+		</tr>
+	
+		<tr> 
+			<td>Email</td>
+			<td><input type="text" name="email" value="<%= email %>" /></td>
+		</tr>
+	
+        	<tr>
+                        <td>Phone Number</td>
+                        <td><input type="text" name="phone" value="<%= phone %>" /></td>
+                </tr>
+                <tr>
+                        <td>Current Organisation</td>
+                        <td><input type="text" name="cur_org" value="<%= cur_org %>" /></td>
+                </tr>
+                <tr>
+                        <td>Zip Code</td>
+                        <td><input type="text" name="zip" title="Five digit zip code" value="<%= zip%>" /></td>
+                </tr>
+                <tr>
+                        <td>State</td>
+                        <td><input type="text" name="state" value="<%= state %>" /></td>
+                </tr>
+                <tr>
+                        <td>City</td>
+                        <td><input type="text" name="city" value="<%= city %>" /></td>
+                </tr>
+                <tr>
+                        <td>Country</td>
+                        <td><input type="text" name="country" value="<%= country %>" /></td>
+                </tr>
+		<tr> 
+			<td></td>
+			<td><input type="submit" name="Submit" style="font-size:10pt;color:white;background-color:blue;padding:3px;font-size: medium" value="Edit" /></td>
+		</tr>
+                <tr>
+                        <td></td>
+                        <td><input type="submit" name="Cancel" style="font-size:10pt;color:white;background-color:tomato;padding:3px;font-size: medium" value="Cancel" onClick="return confirm('Are you sure to cancel?')"/></td>
+                </tr>
+
+	</table>
+	<input type="hidden" name="_method" value="PUT" />
+
+
+</form>
+</div>
+</div>
+
+<!--
+including footer content which is common for all pages
+-->
+<%- include ../layouts/footer.ejs %>

@@ -1,0 +1,83 @@
+<!--
+including header content which is common for all pages
+-->
+<%- include ../layouts/header.ejs %>
+
+<% if (messages.error) { %>
+	<p style="color:red"><%- messages.error %></p>
+<% } %>
+
+<% if (messages.success) { %>
+	<p style="color:green"><%- messages.success %></p>
+<% } %>	
+
+<style>
+.hdr{
+	padding: 20px;
+	text-align: center;
+	color: orangered;
+}
+.bgimg-1 {
+        
+        
+        background-image: url('../mg22.jpg');
+        background-size:cover;
+		background-repeat:repeat-x,repeat-y;
+      }
+</style>
+<div class="bgimg-1">
+<div class="hdr">
+<h2> Full list of users available in Database . . . </h2>
+</div>
+<table width='100%' border=1 style="border: groove;width: fit-content">
+
+	<tr style='text-align:center; background-color:rgb(224, 248, 180);font-family: Verdana, Geneva, Tahoma, sans-serif;border:royalblue'>
+		<th> Name </th>
+		<th>Gender</th>
+		<th>Date of Birth</th>
+		<th>Email</th>
+		<th>Phone Number</th>
+		<th>Current Organization</th>
+		<th>State</th>
+		<th>City</th>
+		<th>Country</th>
+		<th>Zip Code</th>
+		<th>Action</th>
+	</tr>
+	
+	<!-- Using FOREACH LOOP for the users array  -->
+	<% if (data) { %>
+	<% data.forEach(function(user){ %>
+		<tr>
+			<td><%= user.name %></td>
+			<td><%= user.gender %></td>
+			<td><%= user.dob %></td> 
+			<td><%= user.email %></td>
+			<td><%= user.phone %></td>
+                        <td><%= user.cur_org %></td>
+                        
+                        <td><%= user.state %></td>
+			<td><%= user.city %></td>
+			<td><%= user.country %></td>
+			<td><%= user.zip %></td>
+			<td>
+				<div style="float:left">
+		<!--			<a href='/users/edit/<%= user._id %>'>Edit</a> &nbsp;  -->
+					
+			<input type="button" style="font-size:8pt;color:white;background-color:green;padding:3px;font-size: medium;" onclick="window.location.href = '/users/edit/<%= user._id %>';" value="Edit"/> &nbsp;								
+			<form method="post" action="/users/delete/<%= user._id %>" style="float:right">
+			<input type="submit" name="delete" value='Delete' style="font-size:8pt;color:white;background-color:red;padding:3px	;font-size: medium" onClick="return confirm('Are you sure to delete?')" />
+			<input type="hidden" name="_method" value="DELETE" />
+					</form>
+				</div>
+			</td>
+		</tr>
+	<% }) %>
+	<% } %>
+
+</table>
+</div>
+<!--
+including footer content which is common for all pages
+-->
+<%- include ../layouts/footer.ejs %>
