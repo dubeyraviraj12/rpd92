@@ -25,7 +25,7 @@
     "express-validator": "^3.2.0",
     "method-override": "^2.3.10",
     "moment": "^2.24.0",
-    "mongodb": "^2.2.28",
+    "mongodb": "^3.6.1",
     "nodemon": "^1.19.3",
     "rootpath": "^0.1.2"
   }
