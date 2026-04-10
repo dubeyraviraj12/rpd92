@@ -1,11 +1,17 @@
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 import streamlit as st
 import requests
 import json
 from datetime import datetime
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet
+from io import BytesIO
+
 
 # ─── Page Config ──────────────────────────────────────────────────────────────
 st.set_page_config(
-    page_title="ClaimAI – Insurance Description Generator",
+    page_title="AI-Assisted Claim Description Generator – Insurance Description Generator",
     page_icon="⚖️",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -16,95 +22,96 @@ st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Merriweather:wght@400;700&display=swap');
 
+/* Global */
 html, body, [class*="css"] { font-family: 'Merriweather', Georgia, serif; }
-.stApp { background-color: #0a0f1a; color: #e2e8f0; }
+.stApp { background-color: #e6f2ff; color: #0f172a; }
+
+/* Sidebar */
 [data-testid="stSidebar"] {
-    background-color: #0d1520 !important;
-    border-right: 1px solid #1e2d3d;
+    background-color: #dbeafe !important;
+    border-right: 1px solid #93c5fd;
+    display: none !important;
+}
+            section[data-testid="stSidebarNav"] {
+    display: none !important;
 }
 
+/* Header */
 .header-box {
-    background: linear-gradient(135deg, #0d1a2e, #0a1220);
-    border: 1px solid #1e3a5f;
+    background: linear-gradient(135deg, #bfdbfe, #dbeafe);
+    border: 1px solid #93c5fd;
     border-radius: 12px;
     padding: 28px 32px;
     margin-bottom: 28px;
 }
-.header-box h1 {
-    font-family: 'Merriweather', serif;
-    color: #f1f5f9; font-size: 30px; margin: 0 0 6px 0;
-}
-.header-box p {
-    font-family: 'IBM Plex Mono', monospace;
-    color: #64748b; font-size: 11px;
-    letter-spacing: 0.14em; text-transform: uppercase; margin: 0;
-}
+.header-box h1 { color: #1e3a8a; }
+.header-box p  { color: #1d4ed8; }
 
+/* Result Container */
 .result-wrapper {
-    background: linear-gradient(135deg, #0d1a2e, #091525);
-    border: 1px solid #1e3a5f; border-radius: 12px;
-    padding: 24px; margin-top: 20px;
-    box-shadow: 0 0 40px #3b82f610;
+    background: #f0f9ff;
+    border: 1px solid #93c5fd;
+    border-radius: 12px;
+    padding: 24px;
+    margin-top: 20px;
 }
+
+/* Fields */
 .field-box {
-    background: #060d18; border: 1px solid #1e2d3d;
-    border-radius: 8px; padding: 14px 16px; margin-bottom: 12px;
+    background: #ffffff;
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
 }
-.field-box.flagged { border-color: #92400e !important; background: #0c0a06 !important; }
-.field-label {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px; color: #64748b;
-    text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 7px;
+.field-box.flagged {
+    border-color: #f59e0b !important;
+    background: #fef3c7 !important;
 }
-.field-value { color: #cbd5e1; font-size: 14px; line-height: 1.65; }
+.field-label { color: #1d4ed8; }
+.field-value { color: #0f172a; }
 
-.badge {
-    display: inline-block; padding: 4px 14px; border-radius: 20px;
-    font-family: 'IBM Plex Mono', monospace; font-size: 12px;
-    letter-spacing: 0.06em; margin-right: 8px;
-}
-.badge-blue  { background:#1e3a5f; color:#93c5fd; border:1px solid #3b82f655; }
-.badge-green { background:#14532d22; color:#22c55e; border:1px solid #22c55e55; }
-.badge-amber { background:#78350f22; color:#f59e0b; border:1px solid #f59e0b55; }
-.badge-red   { background:#7f1d1d22; color:#ef4444; border:1px solid #ef444455; }
+/* Badges */
+.badge-blue  { background:#dbeafe; color:#1d4ed8; border:1px solid #93c5fd; }
+.badge-green { background:#dcfce7; color:#15803d; border:1px solid #22c55e; }
+.badge-amber { background:#fef3c7; color:#b45309; border:1px solid #f59e0b; }
+.badge-red   { background:#fee2e2; color:#b91c1c; border:1px solid #ef4444; }
+
+/* Chips */
 .chip {
-    display: inline-block; background: #1e2d3d; color: #fbbf24;
-    border: 1px solid #92400e; padding: 2px 10px; border-radius: 12px;
-    font-family: 'IBM Plex Mono', monospace; font-size: 11px; margin: 2px 3px 2px 0;
+    background: #e0f2fe;
+    color: #0369a1;
+    border: 1px solid #7dd3fc;
 }
-.section-num {
-    font-family: 'IBM Plex Mono', monospace;
-    color: #3b82f6; font-size: 13px; font-weight: 700; letter-spacing: 0.1em;
-}
-.hist-card {
-    background: #060d18; border: 1px solid #1e2d3d;
-    border-radius: 8px; padding: 12px; margin-bottom: 8px;
-}
-.hist-title { color: #f1f5f9; font-size: 13px; font-weight: 700; }
-.hist-meta  { font-family:'IBM Plex Mono',monospace; font-size:10px; color:#475569; margin-top:4px; }
 
+/* Inputs */
 div[data-baseweb="textarea"] textarea,
 div[data-baseweb="input"] input {
-    background-color: #060d18 !important;
-    color: #cbd5e1 !important;
-    border-color: #1e2d3d !important;
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border-color: #93c5fd !important;
 }
-label { color: #94a3b8 !important; font-family: 'IBM Plex Mono', monospace !important; font-size: 12px !important; }
+
+/* Labels */
+label {
+    color: #1e3a8a !important;
+}
+
+/* Buttons */
 .stButton > button {
-    background: linear-gradient(135deg, #1d4ed8, #2563eb) !important;
-    color: white !important; border: none !important;
-    border-radius: 8px !important;
-    font-family: 'IBM Plex Mono', monospace !important;
-    font-size: 14px !important; padding: 10px 28px !important;
-    letter-spacing: 0.05em !important;
-    box-shadow: 0 4px 20px #3b82f633 !important;
+    background: linear-gradient(135deg, #3b82f6, #60a5fa) !important;
+    color: white !important;
 }
+
 .stDownloadButton > button {
-    background: #1e2d3d !important; color: #93c5fd !important;
-    border: 1px solid #2d4a6e !important; border-radius: 8px !important;
-    font-family: 'IBM Plex Mono', monospace !important; font-size: 13px !important;
+    background: #dbeafe !important;
+    color: #1d4ed8 !important;
+    border: 1px solid #93c5fd !important;
 }
-hr { border-color: #1e2d3d !important; }
+
+/* Divider */
+hr { border-color: #93c5fd !important; }
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -139,9 +146,9 @@ if "result" not in st.session_state:
 with st.sidebar:
     st.markdown("### ⚙️ LiteLLM Settings")
     st.markdown("---")
-    api_base   = st.text_input("API Base URL",      value="http://0.0.0.0:4000")
-    api_key    = st.text_input("API Key (optional)", type="password", placeholder="sk-...")
-    model      = st.text_input("Model Name",         value="gpt-3.5-turbo")
+    api_base   = st.text_input("API Base URL",      value="https://genailab.tcs.in" )
+    api_key    = st.text_input("API Key ",          value="sk-yv-EahzMmpNCJuXpmosM-Q")
+    model      = st.text_input("Model Name",        value="genailab-maas-gpt-4o")
     max_tokens = st.slider("Max Tokens", 500, 2000, 1000, 100)
 
     st.markdown("---")
@@ -169,7 +176,7 @@ Generator for Insurance Adjusters<br><br>
 # ─── Header ───────────────────────────────────────────────────────────────────
 st.markdown("""
 <div class='header-box'>
-  <h1>⚖️ ClaimAI</h1>
+  <h1>⚖️ AI-Assisted Claim Description Generator</h1>
   <p>AI-Assisted Insurance Claim Description Generator · Powered by LiteLLM</p>
 </div>
 """, unsafe_allow_html=True)
@@ -198,12 +205,44 @@ with col2:
         st.rerun()
 
 # ─── API Call ─────────────────────────────────────────────────────────────────
+def generate_pdf(result):
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer)
+    styles = getSampleStyleSheet()
+    content = []
+
+    content.append(Paragraph("INSURANCE CLAIM DESCRIPTION", styles["Title"]))
+    content.append(Spacer(1, 10))
+
+    fields = [
+        ("Claim Title", result.get("claimTitle","")),
+        ("Claim Type", result.get("claimType","")),
+        ("Incident Date", result.get("incidentDate","")),
+        ("Parties Involved", result.get("partiesInvolved","")),
+        ("Incident Summary", result.get("incidentSummary","")),
+        ("Damage Description", result.get("damageDescription","")),
+        ("Liability Notes", result.get("liabilityNotes","")),
+        ("Recommended Actions", result.get("recommendedActions","")),
+        ("Confidence Score", result.get("confidenceScore","")),
+        ("Flagged Fields", ", ".join(result.get("flaggedFields",[])) or "None"),
+    ]
+
+    for title, value in fields:
+        content.append(Paragraph(f"<b>{title}:</b> {value}", styles["Normal"]))
+        content.append(Spacer(1, 8))
+
+    doc.build(content)
+    buffer.seek(0)
+    return buffer
+####
+
 def call_litellm(text):
     headers = {"Content-Type": "application/json"}
     if api_key:
         headers["Authorization"] = f"Bearer {api_key}"
     payload = {
         "model": model,
+        "temperature": 0.2,
         "max_tokens": max_tokens,
         "messages": [
             {"role": "system", "content": SYSTEM_PROMPT},
@@ -212,7 +251,7 @@ def call_litellm(text):
     }
     resp = requests.post(
         f"{api_base.rstrip('/')}/chat/completions",
-        headers=headers, json=payload, timeout=60,
+        headers=headers, json=payload, timeout=60,verify=False,
     )
     resp.raise_for_status()
     raw = resp.json()["choices"][0]["message"]["content"]
@@ -277,7 +316,7 @@ if result:
   <!-- Title -->
   <div class='field-box'>
     <div class='field-label'>Claim Title</div>
-    <div class='field-value' style='font-size:18px;font-weight:700;color:#f1f5f9;'>
+    <div class='field-value' style='font-size:18px;font-weight:700;color:#1e3a8a;'>
       {result.get("claimTitle","—")}
     </div>
   </div>
@@ -329,7 +368,9 @@ if result:
 
     # ─── Export ───────────────────────────────────────────────────────────────
     st.markdown("#### 📤 Export")
-    ec1, ec2, _ = st.columns([1, 1, 2])
+    ##ec1, ec2, _ = st.columns([1, 1, 2])
+    ec1, ec2, ec3 = st.columns([1, 1, 1])
+
 
     plain = "\n".join([
         "=" * 60,
@@ -363,7 +404,18 @@ if result:
         st.download_button("⬇️ Download .json", json.dumps(result, indent=2),
                            file_name=f"claim_{ts}.json", mime="application/json",
                            use_container_width=True)
+    
+        use_container_width=True
+        pdf_file = generate_pdf(result)
 
+    with ec3:
+        st.download_button(
+            "⬇️ Download PDF",
+            pdf_file,
+            file_name=f"claim_{ts}.pdf",
+            mime="application/pdf",
+            use_container_width=True
+    )
     with st.expander("🔍 View Raw JSON"):
         st.json(result)
 
@@ -383,5 +435,5 @@ st.markdown("---")
 st.markdown("""
 <div style='text-align:center;font-family:IBM Plex Mono,monospace;
             font-size:11px;color:#1e2d3d;letter-spacing:0.1em;padding:6px 0;'>
-  TCS AI FRIDAYS SEASON 2 · CLAIMAI · POWERED BY LITELLM
+  TCS AI FRIDAYS SEASON 2 · AI-Assisted Claim Description Generator · POWERED BY LITELLM
 </div>""", unsafe_allow_html=True)
